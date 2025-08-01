@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Kasir Sederhana by Rizki Fajar Tutorial Channel</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        /* Style for the logo image */
+        .logo {
+            display: none; /* Logo disembunyikan */
+            /* margin: 0 auto 20px auto; */ /* Tidak perlu margin jika disembunyikan */
+            /* max-width: 150px; */
+            /* height: auto; */
+            /* border-radius: 8px; */
+        }
+        .section { /* General class for all sections */
+            margin-bottom: 25px;
+            padding: 18px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        textarea {
+            resize: vertical; /* Allow vertical resizing for address */
+            min-height: 60px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin-right: 10px; /* Jarak antar tombol */
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .payment-section button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            background-color: #28a745;
+        }
+        .payment-section button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #555;
+        }
+        .action-buttons button {
+            margin-right: 8px;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        .action-buttons .edit-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .action-buttons .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        .action-buttons .delete-btn {
+            background-color: #dc3545;
+        }
+        .action-buttons .delete-btn:hover {
+            background-color: #c82333;
+        }
+        #totalBayar {
+            font-size: 1.6em;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 15px;
+            color: #28a745;
+        }
+
+        /* Struk Pembayaran */
+        .receipt-section {
+            display: none; /* Sembunyikan secara default */
+            border: 2px dashed #0056b3;
+            background-color: #e6f7ff;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            font-size: 0.95em;
+            color: #003366;
+            margin-top: 30px; /* Space from previous section */
+        }
+        /* Perbaikan styling untuk h3 di struk */
+        .receipt-section h3 {
+            text-align: center;
+            margin-bottom: 15px; /* Pastikan ada margin bawah */
+            padding-top: 5px; /* Tambahkan sedikit padding atas */
+            padding-bottom: 5px; /* Tambahkan sedikit padding bawah */
+            color: #0056b3;
+            /* Tambahan: Pastikan tidak ada properti yang menyembunyikan */
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .receipt-section .shop-info {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        .receipt-section .shop-info p {
+            margin: 2px 0;
+        }
+        .receipt-section .customer-info {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        .receipt-section .customer-info p {
+            margin: 2px 0;
+        }
+        .receipt-section p {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .receipt-section .item-receipt {
+            display: flex;
+            justify-content: space-between;
+        }
+        .receipt-section .item-receipt span:first-child {
+            flex-grow: 1;
+        }
+        .receipt-section .receipt-separator {
+            border-top: 1px dashed #0056b3;
+            margin: 10px 0;
+        }
+        .receipt-section .receipt-total,
+        .receipt-section .receipt-cash,
+        .receipt-section .receipt-change {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .receipt-section .receipt-thank-you {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            color: #0056b3;
+        }
+
+        .receipt-actions {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px; /* Memberikan ruang di bawah tombol */
+        }
+        .receipt-actions button {
+            background-color: #6c757d; /* Abu-abu untuk tombol aksi struk */
+            padding: 10px 20px;
+        }
+        .receipt-actions button:hover {
+            background-color: #5a6268;
+        }
+
+        /* Print Specific Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .receipt-section, .receipt-section * {
+                visibility: visible;
+            }
+            .receipt-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%; /* Memastikan struk mengisi lebar halaman cetak */
+                border: none; /* Hapus border pada saat cetak */
+                box-shadow: none; /* Hapus shadow */
+                background-color: #fff; /* Pastikan latar belakang putih */
+                padding: 0; /* Hapus padding agar lebih pas */
+            }
+            .receipt-actions {
+                display: none; /* Sembunyikan tombol cetak/simpan saat mencetak */
+            }
+        }
+
+        /* Animasi Teks Bergulir */
+        .scrolling-text {
+            white-space: nowrap; /* Mencegah teks melipat */
+            overflow: hidden; /* Menyembunyikan bagian teks yang keluar */
+            box-sizing: border-box;
+            margin-bottom: 5px; /* Kurangi margin bawah untuk jarak ke link */
+            font-size: 1.2em;
+            color: #0056b3; /* Warna teks yang lebih menonjol */
+            padding: 5px 10px; /* Sedikit padding */
+            background-color: #e0f7fa; /* Warna latar belakang ringan */
+            border-radius: 4px;
+            text-align: center; /* Pusatkan teks saat tidak bergulir */
+        }
+
+        .scrolling-text span {
+            display: inline-block;
+            padding-left: 100%; /* Memulai teks dari luar kanan */
+            animation: marquee 15s linear infinite; /* Durasi dan jenis animasi */
+        }
+
+        @keyframes marquee {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+
+        /* Style for the YouTube link */
+        .youtube-link {
+            display: block; /* Make it a block element to center */
+            text-align: center;
+            margin-bottom: 20px; /* Jarak dari link ke input field */
+            font-size: 0.9em;
+        }
+        .youtube-link a {
+            color: #dc3545; /* Warna merah untuk YouTube */
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .youtube-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Aplikasi Kasir Sederhana</h1>
+
+        <div class="section" id="storeInfoSection">
+            <h2>Informasi Toko & Pelanggan</h2>
+            <label for="namaToko">Nama Toko:</label>
+            <input type="text" id="namaToko" placeholder="Contoh: Toko Maju Jaya" value="Toko Maju Jaya">
+
+            <label for="alamatToko">Alamat Toko:</label>
+            <textarea id="alamatToko" placeholder="Contoh: Jl. Merdeka No. 123, Kota ABC">Jl. Contoh Alamat No. 123</textarea>
+
+            <label for="telpToko">No. Telepon Toko:</label>
+            <input type="text" id="telpToko" placeholder="Contoh: 08123456789" value="0812-3456-7890">
+
+            <label for="namaPelanggan">Nama Pelanggan (Opsional):</label>
+            <input type="text" id="namaPelanggan" placeholder="Isi jika ada nama pelanggan">
+        </div>
+
+        <div class="section">
+            <h2>Tambah Barang</h2>
+            <p class="scrolling-text"><span>Kunjungi channel Youtube Riki Fajar Tutorial</span></p>
+            <p class="youtube-link"><a href="www.youtube.com/@rizkifajarbanten" target="_blank">www.youtube.com/@rizkifajarbanten</a></p>
+
+            <label for="namaBarang">Nama Barang:</label>
+            <input type="text" id="namaBarang" placeholder="Masukkan nama barang">
+
+            <label for="hargaBarang">Harga (Rp):</label>
+            <input type="number" id="hargaBarang" min="0" value="0">
+
+            <label for="jumlahBarang">Jumlah:</label>
+            <input type="number" id="jumlahBarang" min="1" value="1">
+
+            <button onclick="tambahBarang()">Tambah ke Keranjang</button>
+        </div>
+
+        <div class="section">
+            <h2>Daftar Belanjaan</h2>
+            <table id="daftarBelanjaan">
+                <thead>
+                    <tr>
+                        <th>Nama Barang</th>
+                        <th>Harga</th>
+                        <th>Jumlah</th>
+                        <th>Subtotal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+            <p id="totalBayar">Total: Rp 0</p>
+        </div>
+
+        <div class="section payment-section">
+            <h2>Pembayaran</h2>
+            <label for="uangBayar">Uang Dibayar (Rp):</label>
+            <input type="number" id="uangBayar" min="0" value="0">
+            <p id="kembalian" style="font-size: 1.3em; font-weight: bold; color: #dc3545;">Kembalian: Rp 0</p>
+            <button onclick="prosesPembayaran()">Bayar</button>
+        </div>
+
+        <div class="receipt-section" id="receiptSection">
+            <h3>STRUK PEMBAYARAN</h3>
+            <div class="shop-info">
+                <p><strong id="receiptShopName">Nama Toko</strong></p>
+                <p id="receiptShopAddress">Alamat Toko</p>
+                <p>Telp: <span id="receiptShopTelp">No. Telepon</span></p>
+            </div>
+            <div class="receipt-separator"></div>
+            <p style="text-align: center;">Tanggal: <span id="receiptDate"></span></p>
+            <div class="customer-info" id="receiptCustomerInfo" style="display: none;">
+                <p>Pelanggan: <span id="receiptCustomerName"></span></p>
+            </div>
+            <div class="receipt-separator"></div>
+            <div id="receiptItems">
+                </div>
+            <div class="receipt-separator"></div>
+            <p class="receipt-total">Total Belanja: <span>Rp <span id="receiptTotal">0</span></span></p>
+            <p class="receipt-cash">Uang Dibayar: <span>Rp <span id="receiptCash">0</span></span></p>
+            <p class="receipt-change">Kembalian: <span>Rp <span id="receiptChange">0</span></span></p>
+            <div class="receipt-separator"></div>
+            <p class="receipt-thank-you">Terima Kasih Telah Berbelanja! Mau Aplikasi kasir gratis ? kunjungi channel youtube Rizki Fajar Tutorial</p>
+        </div>
+
+        <div class="receipt-actions" id="receiptActions" style="display: none;">
+            <button onclick="cetakStruk()">Cetak Struk /Simpan (pdf)</button>
+            </div>
+    </div>
+
+    <script>
+        // Array untuk menyimpan daftar produk simulasi dengan barcode
+        // Daftar ini masih ada, namun fungsionalitas scan otomatis telah dihapus.
+        // Anda bisa menggunakannya untuk mengisi data secara manual jika diperlukan.
+        const daftarProduk = [
+            { barcode: '123456789012', nama: 'Baju Kaos XL', harga: 75000 },
+            { barcode: '987654321098', nama: 'Celana Jeans', harga: 150000 },
+            { barcode: '112233445566', nama: 'Sepatu Sport', harga: 225000 },
+            { barcode: '778899001122', nama: 'Topi Baseball', harga: 30000 },
+            { barcode: '554433221100', nama: 'Kaos Kaki', harga: 15000 },
+            { barcode: '200000000001', nama: 'Sabun Mandi', harga: 10000 },
+            { barcode: '200000000002', nama: 'Pasta Gigi', harga: 12500 },
+            { barcode: '200000000003', nama: 'Shampo 200ml', harga: 25000 },
+            // Anda bisa menambahkan lebih banyak produk di sini
+        ];
+
+        let items = []; // Array untuk menyimpan daftar belanjaan
+        let totalBelanja = 0; // Variabel untuk menyimpan total belanja
+
+        // Fungsi untuk memformat angka menjadi format mata uang Rupiah
+        function formatRupiah(angka) {
+            return angka.toLocaleString('id-ID');
+        }
+
+        function tambahBarang() {
+            const namaBarangInput = document.getElementById('namaBarang');
+            const hargaBarangInput = document.getElementById('hargaBarang');
+            const jumlahBarangInput = document.getElementById('jumlahBarang');
+
+            const namaBarang = namaBarangInput.value.trim();
+            const hargaBarang = parseFloat(hargaBarangInput.value);
+            const jumlahBarang = parseInt(jumlahBarangInput.value);
+
+            if (!namaBarang || isNaN(hargaBarang) || isNaN(jumlahBarang) || hargaBarang <= 0 || jumlahBarang <= 0) {
+                showCustomAlert('Mohon lengkapi semua kolom dengan benar (harga dan jumlah harus lebih dari 0 dan nama barang tidak boleh kosong).');
+                return;
+            }
+
+            const subtotal = hargaBarang * jumlahBarang;
+
+            const newItem = {
+                nama: namaBarang,
+                harga: hargaBarang,
+                jumlah: jumlahBarang,
+                subtotal: subtotal
+            };
+
+            items.push(newItem);
+            renderDaftarBelanjaan();
+            hitungTotalBelanja();
+            clearInputFields();
+        }
+
+        function renderDaftarBelanjaan() {
+            const tbody = document.getElementById('daftarBelanjaan').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = ''; // Kosongkan tabel sebelum merender ulang
+
+            items.forEach((item, index) => {
+                const row = tbody.insertRow();
+
+                row.insertCell(0).textContent = item.nama;
+                row.insertCell(1).textContent = 'Rp ' + formatRupiah(item.harga);
+                row.insertCell(2).textContent = item.jumlah;
+                row.insertCell(3).textContent = 'Rp ' + formatRupiah(item.subtotal);
+
+                const actionCell = row.insertCell(4);
+                actionCell.classList.add('action-buttons');
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.classList.add('edit-btn');
+                editButton.onclick = () => editItem(index);
+                actionCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Hapus';
+                deleteButton.classList.add('delete-btn');
+                deleteButton.onclick = () => deleteItem(index);
+                actionCell.appendChild(deleteButton);
+            });
+        }
+
+        function hitungTotalBelanja() {
+            totalBelanja = 0;
+            items.forEach(item => {
+                totalBelanja += item.subtotal;
+            });
+            document.getElementById('totalBayar').textContent = 'Total: Rp ' + formatRupiah(totalBelanja);
+            // Reset kembalian saat total belanja berubah
+            document.getElementById('kembalian').textContent = 'Kembalian: Rp 0';
+            document.getElementById('uangBayar').value = '0';
+            // Sembunyikan struk dan tombol aksi struk jika ada perubahan
+            document.getElementById('receiptSection').style.display = 'none';
+            document.getElementById('receiptActions').style.display = 'none';
+        }
+
+        function clearInputFields() {
+            document.getElementById('namaBarang').value = '';
+            document.getElementById('hargaBarang').value = '0';
+            document.getElementById('jumlahBarang').value = '1';
+            document.getElementById('namaBarang').focus(); // Fokuskan kembali ke input nama barang
+        }
+
+        function editItem(index) {
+            const itemToEdit = items[index];
+
+            document.getElementById('namaBarang').value = itemToEdit.nama;
+            document.getElementById('hargaBarang').value = itemToEdit.harga;
+            document.getElementById('jumlahBarang').value = itemToEdit.jumlah;
+
+            // Hapus item dari array setelah data diambil
+            items.splice(index, 1);
+            renderDaftarBelanjaan();
+            hitungTotalBelanja();
+        }
+
+        function deleteItem(index) {
+            // Menggunakan modal kustom sebagai pengganti alert/confirm
+            showCustomConfirm('Apakah Anda yakin ingin menghapus barang ini?', () => {
+                items.splice(index, 1); // Hapus item dari array
+                renderDaftarBelanjaan(); // Render ulang daftar
+                hitungTotalBelanja(); // Hitung ulang total
+            });
+        }
+
+        function prosesPembayaran() {
+            const uangBayar = parseFloat(document.getElementById('uangBayar').value);
+
+            if (items.length === 0) {
+                showCustomAlert('Keranjang belanja masih kosong!');
+                return;
+            }
+
+            if (isNaN(uangBayar) || uangBayar < 0) {
+                showCustomAlert('Jumlah uang yang dibayarkan tidak valid.');
+                return;
+            }
+
+            if (uangBayar < totalBelanja) {
+                showCustomAlert('Uang yang dibayarkan kurang!');
+                return;
+            }
+
+            const kembalian = uangBayar - totalBelanja;
+            document.getElementById('kembalian').textContent = 'Kembalian: Rp ' + formatRupiah(kembalian);
+
+            generateStruk(uangBayar, kembalian);
+            document.getElementById('receiptSection').style.display = 'block'; // Tampilkan struk
+            document.getElementById('receiptActions').style.display = 'block'; // Tampilkan tombol aksi struk
+
+            // Opsional: Reset belanjaan setelah pembayaran sukses
+            // items = [];
+            // renderDaftarBelanjaan();
+            // hitungTotalBelanja();
+        }
+
+        function generateStruk(uangBayar, kembalian) {
+            const receiptItemsDiv = document.getElementById('receiptItems');
+            receiptItemsDiv.innerHTML = ''; // Kosongkan item struk sebelumnya
+
+            // Ambil informasi toko dan pelanggan
+            const namaToko = document.getElementById('namaToko').value.trim();
+            const alamatToko = document.getElementById('alamatToko').value.trim();
+            const telpToko = document.getElementById('telpToko').value.trim();
+            const namaPelanggan = document.getElementById('namaPelanggan').value.trim();
+
+            // Isi informasi toko di struk
+            document.getElementById('receiptShopName').textContent = namaToko || 'Nama Toko Anda';
+            document.getElementById('receiptShopAddress').textContent = alamatToko || 'Alamat Toko Anda';
+            document.getElementById('receiptShopTelp').textContent = telpToko || '-';
+
+            // Isi informasi pelanggan (jika ada)
+            const receiptCustomerInfoDiv = document.getElementById('receiptCustomerInfo');
+            if (namaPelanggan) {
+                document.getElementById('receiptCustomerName').textContent = namaPelanggan;
+                receiptCustomerInfoDiv.style.display = 'block';
+            } else {
+                receiptCustomerInfoDiv.style.display = 'none';
+            }
+
+            items.forEach(item => {
+                const itemDiv = document.createElement('p');
+                itemDiv.classList.add('item-receipt');
+                itemDiv.innerHTML = `
+                    <span>${item.nama} (${item.jumlah}x)</span>
+                    <span>Rp ${formatRupiah(item.subtotal)}</span>
+                `;
+                receiptItemsDiv.appendChild(itemDiv);
+            });
+
+            document.getElementById('receiptTotal').textContent = formatRupiah(totalBelanja);
+            document.getElementById('receiptCash').textContent = formatRupiah(uangBayar);
+            document.getElementById('receiptChange').textContent = formatRupiah(kembalian);
+
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('receiptDate').textContent = now.toLocaleDateString('id-ID', dateOptions);
+        }
+
+        // --- Fungsi untuk Cetak dan Simpan PDF ---
+
+        function cetakStruk() {
+            window.print();
+        }
+
+        // Fungsi simpanPdf() telah dihapus
+
+        // Panggil fungsi renderDaftarBelanjaan dan hitungTotalBelanja saat halaman pertama kali dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDaftarBelanjaan();
+            hitungTotalBelanja();
+        });
+
+        // --- Custom Alert/Confirm Modal (Pengganti alert() dan confirm()) ---
+
+        // Fungsi untuk menampilkan custom alert
+        function showCustomAlert(message) {
+            const modal = document.getElementById('customModal');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalOkBtn = document.getElementById('modalOkBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+            modalMessage.textContent = message;
+            modalCancelBtn.style.display = 'none'; // Sembunyikan tombol batal
+            modalOkBtn.onclick = () => modal.style.display = 'none'; // Sembunyikan modal saat OK diklik
+            modal.style.display = 'flex'; // Tampilkan modal
+        }
+
+        // Fungsi untuk menampilkan custom confirm
+        function showCustomConfirm(message, onConfirm) {
+            const modal = document.getElementById('customModal');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalOkBtn = document.getElementById('modalOkBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+            modalMessage.textContent = message;
+            modalCancelBtn.style.display = 'inline-block'; // Tampilkan tombol batal
+            modalOkBtn.onclick = () => {
+                modal.style.display = 'none';
+                if (onConfirm) onConfirm();
+            };
+            modalCancelBtn.onclick = () => modal.style.display = 'none'; // Sembunyikan modal saat Batal diklik
+            modal.style.display = 'flex'; // Tampilkan modal
+        }
+
+        // Tambahkan modal ke body saat DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalHtml = `
+                <div id="customModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+                    <div style="background:white; padding:20px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.2); max-width:400px; text-align:center;">
+                        <p id="modalMessage" style="margin-bottom:20px;"></p>
+                        <button id="modalOkBtn" style="background-color:#007bff; color:white; padding:8px 15px; border:none; border-radius:4px; cursor:pointer;">OK</button>
+                        <button id="modalCancelBtn" style="background-color:#6c757d; color:white; padding:8px 15px; border:none; border-radius:4px; cursor:pointer; margin-left:10px; display:none;">Batal</button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        });
+    </script>
+</body>
+</html>
